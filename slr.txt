@@ -1,0 +1,117 @@
+mtcars
+head(mtcars)
+tail(mtcars)
+str(mtcars)
+summary(mtcars)
+dim(mtcars)
+mtcars$mpg
+
+#SCATTER PLOT
+
+plot(x=mtcars$wt, y=mtcars$mpg,
+main="car weight v/s fuel efficiency",
+xlab="weight(1000 lbs)",  
+ylab="miles per gallon(mpg)",
+col="red", pch=19)
+
+#ABLINE 
+
+abline(lm(mpg~wt,data=mtcars),col="blue", lwd=2)
+
+#GGPLOT2
+
+ library(ggplot2)
+
+ggplot(data = mtcars, aes(x = wt, y = mpg)) +
+  geom_point(aes(color = factor(cyl)), size = 3) +
+  geom_smooth(method = "lm", color = "black", se = FALSE) +
+  labs(
+    title = "Car Weight vs Fuel Efficiency",
+    x = "Weight (1000 lbs)",
+    y = "Miles per Gallon (MPG)",
+    color = "Cylinder"
+  ) +
+  theme_minimal()  
+
+
+  #CORRELATION TEST
+corr_test = cor.test(
+  mtcars$wt,
+  mtcars$mpg,
+  method = "pearson"
+)
+
+print(corr_test)
+
+# r value
+r_val=round(corr_test$estimate,4)
+r_val
+
+#CORRELATION MATRIX
+
+mydata=mtcars[c(1,3,4,5)]
+corr_2=round(cor(my_data,method="pearson"),4)
+corr_2
+
+#CORRELATION PLOT(heat  map)
+
+library(corrplot)
+corrplot(corr_2,type="upper",order="hclust",
+bl.col='red', tl.srt=45)
+
+
+
+
+
+----------------------------------------------------
+cars
+summary(cars)
+dim(cars)
+#mean
+speed=cars$speed
+speed_bar=mean(speed)
+speed_bar
+
+dist=cars$dist
+dist_bar=mean(dist)
+dist_bar
+
+r=cor(speed,dist) 
+r 
+ s_speed=sd(speed) 
+ s_speed 
+  s_dist=sd(dist)  
+  s_dist
+
+ b1=r*(s_dist/s_speed) 
+ b1 
+ bo=dist_bar-b1*speed_bar 
+ bo  
+
+ plot(speed, dist, 
+ ylab = "Car Stopping Distance (ft)", 
+ xlab = "Speed (mp h)", 
+ main = "Car Speed vs. Stopping Distance") 
+ #SLR
+ SLR=lm(dist~speed)
+ SLR
+
+#NORMALITY ASSUMPTION OF THE ERROR TERM
+residual=SLR$residuals
+#HOMOSCEDASTICITY 
+plot(SLR$residuals~speed)
+abline(0,0)
+#R^2 goodness fit
+summary(SLR)
+
+#ANOVA
+anova(SLR)
+Ft=qf(0.95,df1=1,df2=48)
+Ft
+
+confint(SLR,level=0.95)
+
+-----------------------------
+
+
+
