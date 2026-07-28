@@ -1,0 +1,58 @@
+# Install required packages (only once)
+install.packages("UsingR")
+install.packages("lmtest")
+install.packages("ggplot2")
+install.packages("broom")
+
+# Load packages
+library(UsingR)
+library(lmtest)
+library(ggplot2)
+library(broom)
+
+# Load the dataset
+mydata = diamond
+
+# Display the dataset
+head(mydata)
+
+# Fit a Simple Linear Regression model
+fit = lm(price ~ carat, data = mydata)
+
+# Display the summary of the model
+summary(fit)
+
+# Scatter plot with regression line (Base R)
+plot(mydata$carat, mydata$price,
+     xlab = "Carat",
+     ylab = "Price",
+     main = "Carat vs Price")
+
+abline(fit, col = "red", lwd = 2)
+
+# Diagnostic metrics
+model.diag.metrics = augment(fit)
+head(model.diag.metrics)
+
+# Observed vs Fitted values using ggplot2
+ggplot(model.diag.metrics,
+       aes(x = carat, y = price)) +
+  geom_point() +
+  stat_smooth(method = "lm", se = FALSE) +
+  geom_segment(aes(xend = carat,
+                   yend = .fitted),
+               color = "red",
+               linewidth = 0.5) +
+  labs(
+    x = "Carat",
+    y = "Price",
+    title = "Observed vs Fitted Values"
+  ) +
+  theme_minimal()
+
+# Diagnostic plots
+plot(fit, which = 1)
+plot(fit, which = 2)
+plot(fit, which = 3)
+plot(fit, which = 4)
+plot(fit, which = 5)
