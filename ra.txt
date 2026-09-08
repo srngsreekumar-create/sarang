@@ -69,3 +69,21 @@ str(mydata)
 model = lm(mpg ~ cyl + disp + hp + wt, data = mydata)
 
 model
+
+corr_test=cor.test(mtcars$wt,mtcars$mpg,
+                   method="pearson")
+print(corr_test)
+
+ggplot(data=mtcars, aes(x=wt, y=mpg)) +
+  geom_point(aes(color=factor(cyl)), size=3) +
+  geom_smooth(method="lm", color="pink", se=FALSE) +
+  labs(title="car weight vs mpg", x="Weight", y="Miles per gallon", color="Cylinders") +
+  theme_minimal()
+
+mydata=diamonds
+plot(mydata$carat,mydata$price,ylab="price",xlab="carat",main="prics vs carat")
+
+fit=lm(mydata$price~mydata$carat)
+fit
+
+
