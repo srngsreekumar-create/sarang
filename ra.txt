@@ -56,3 +56,16 @@ plot(fit, which = 2)
 plot(fit, which = 3)
 plot(fit, which = 4)
 plot(fit, which = 5)
+
+library(dplyr)
+
+mydata = mtcars %>%
+  select(mpg, cyl, disp, hp, wt)
+
+# Check the data
+str(mydata)
+
+# Build model
+model = lm(mpg ~ cyl + disp + hp + wt, data = mydata)
+
+model
