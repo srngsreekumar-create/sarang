@@ -1,117 +1,106 @@
-mtcars
-head(mtcars)
-tail(mtcars)
-str(mtcars)
-summary(mtcars)
-dim(mtcars)
-mtcars$mpg
+#scatter plot
+plot(x=mtcar$wt,y=mtcars$mpg,
+     main="car weight vs fuel efficincy",
+     xlab="weight(1000 lbs",
+     ylab="miles per gallon(mpg0",
+     col="red,pch=19")
 
-#SCATTER PLOT
-
-plot(x=mtcars$wt, y=mtcars$mpg,
-main="car weight v/s fuel efficiency",
-xlab="weight(1000 lbs)",  
-ylab="miles per gallon(mpg)",
-col="red", pch=19)
-
-#ABLINE 
-
-abline(lm(mpg~wt,data=mtcars),col="blue", lwd=2)
-
-#GGPLOT2
-
- library(ggplot2)
-
-ggplot(data = mtcars, aes(x = wt, y = mpg)) +
-  geom_point(aes(color = factor(cyl)), size = 3) +
-  geom_smooth(method = "lm", color = "black", se = FALSE) +
-  labs(
-    title = "Car Weight vs Fuel Efficiency",
-    x = "Weight (1000 lbs)",
-    y = "Miles per Gallon (MPG)",
-    color = "Cylinder"
-  ) +
-  theme_minimal()  
-
-
-  #CORRELATION TEST
-corr_test = cor.test(
-  mtcars$wt,
-  mtcars$mpg,
-  method = "pearson"
-)
-
+#correlation test
+corr_test=cor.test(mtcars$wt,mtcars$mpg,
+                   method="pearson")
 print(corr_test)
 
-# r value
-r_val=round(corr_test$estimate,4)
+#residual analysis
+r_val=(corr_test$estimate,)
 r_val
 
-#CORRELATION MATRIX
-
-mydata=mtcars[c(1,3,4,5)]
-corr_2=round(cor(my_data,method="pearson"),4)
-corr_2
-
-#CORRELATION PLOT(heat  map)
-
-library(corrplot)
-corrplot(corr_2,type="upper",order="hclust",
-bl.col='red', tl.srt=45)
-
-
-
-
-
-----------------------------------------------------
+#regression coefficients
 cars
-summary(cars)
-dim(cars)
-#mean
-speed=cars$speed
-speed_bar=mean(speed)
-speed_bar
+s=cars$speed
+s_bar=mean(s)
+s_bar
 
-dist=cars$dist
-dist_bar=mean(dist)
-dist_bar
+d=cars$dist
+d_bar=mean(d)
+d_bar
 
-r=cor(speed,dist) 
-r 
- s_speed=sd(speed) 
- s_speed 
-  s_dist=sd(dist)  
-  s_dist
+r=cor(dist,speed)
+r
 
- b1=r*(s_dist/s_speed) 
- b1 
- bo=dist_bar-b1*speed_bar 
- bo  
+x=sd(s)
+x
 
- plot(speed, dist, 
- ylab = "Car Stopping Distance (ft)", 
- xlab = "Speed (mp h)", 
- main = "Car Speed vs. Stopping Distance") 
- #SLR
- SLR=lm(dist~speed)
- SLR
+y=sd(d)
+y
 
-#NORMALITY ASSUMPTION OF THE ERROR TERM
+b1=r*(y/x)
+b1
+
+b0=d_bar-b1*s_bar
+b0
+
+plot(cars$speed,cars$dist,
+     ylab="car stopping distnace",
+     xlab="speed",
+     main="car speed vs stopping distnace")
+
+SLR=lm(dist~speed)
+SLR
+
+#normality assumption of the error term
 residual=SLR$residuals
-#HOMOSCEDASTICITY 
+residual
+
+#homoscedasticity assumption
 plot(SLR$residuals~speed)
 abline(0,0)
-#R^2 goodness fit
+
+# R^2 and goodness fit
 summary(SLR)
 
-#ANOVA
+#hypothesis test for the significance of slope
 anova(SLR)
-Ft=qf(0.95,df1=1,df2=48)
-Ft
+lin_Mod=lm(dist~speed,data=cars)
+lin_Mod
 
-confint(SLR,level=0.95)
+new_speeds=data.frame(speed=c(13,20,25,10))
+new_speeds
 
------------------------------
+predict(lin_Mod,newdata = new_speeds)
+predict(lin_Mod,newdata = new_speeds,interval="prediction")
+mydata=cars
+library("ggplot2")
+p=ggplot(mydata,aes(speed,dist))+
+  geom_point()+
+  stat_smooth(method=lm)
+p
+p+geom_line(aes(y=lwr),col="red",linetype="dashed")+
+  geom_line(aes(y=upr),col="red",linetype="dashed")
 
+mtcars
+names(mtcars)
+summary(mtcars)
 
+model=lm(mpg~cyl+disp+hp+drat+wt+qsec+vs+am+gear+carb,data=mtcars)
+model
 
+teststat=coef(summary(model))[3,1]/
+  coef(summary(model))[3/2]
+teststat
+
+2*pt(teststat,21,lower.tail=FALSE)
+
+plot(model$residuals~mtcars$disp)
+abline(0,0)
+
+model2=lm(mpg~qsec+wt+am,data = mtcars)
+summary(model2)
+
+new_values=data.frame(wt=2.92,qsec=20.1,am=1)
+new_values
+
+x=predict(model2,new_values,interval="prediction")
+x
+
+y=predict(model2,new_values,interval="confidence")
+y
