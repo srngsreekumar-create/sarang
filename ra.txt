@@ -1,91 +1,41 @@
-# Install required packages (only once)
-install.packages("UsingR")
-install.packages("lmtest")
-install.packages("ggplot2")
-install.packages("broom")
+#validating and tesing slr
 
-# Load packages
-library(UsingR)
-library(lmtest)
-library(ggplot2)
-library(broom)
+faithful
 
-# Load the dataset
-mydata = diamond
+scatter.smooth(x=faithful$eruptions,y=faithful$waiting,
+               main="waiting time v/s eruption duration",
+               xlab="eruption duration",ylab = "waiting time")
 
-# Display the dataset
-head(mydata)
+cor(faithful$eruptions,faithful$waiting)
 
-# Fit a Simple Linear Regression model
-fit = lm(price ~ carat, data = mydata)
+l=lm(waiting~eruptions,data = faithful)
+l
 
-# Display the summary of the model
-summary(fit)
+model_summary=summary(l)
+model_summary
 
-# Scatter plot with regression line (Base R)
-plot(mydata$carat, mydata$price,
-     xlab = "Carat",
-     ylab = "Price",
-     main = "Carat vs Price")
+model_coeffs=model_summary$coefficients
+model_coeffs
 
-abline(fit, col = "red", lwd = 2)
+nrow(faithful)
 
-# Diagnostic metrics
-model.diag.metrics = augment(fit)
-head(model.diag.metrics)
+beta.estimate=model_coeffs["eruptions","Estimate"]
+beta.estimate
 
-# Observed vs Fitted values using ggplot2
-ggplot(model.diag.metrics,
-       aes(x = carat, y = price)) +
-  geom_point() +
-  stat_smooth(method = "lm", se = FALSE) +
-  geom_segment(aes(xend = carat,
-                   yend = .fitted),
-               color = "red",
-               linewidth = 0.5) +
-  labs(
-    x = "Carat",
-    y = "Price",
-    title = "Observed vs Fitted Values"
-  ) +
-  theme_minimal()
+std.error=model_coeffs["eruptions","Std. Error"]
+std.error
 
-# Diagnostic plots
-plot(fit, which = 1)
-plot(fit, which = 2)
-plot(fit, which = 3)
-plot(fit, which = 4)
-plot(fit, which = 5)
+t_value=beta.estimate/std.error
+t_value
 
-library(dplyr)
+alpha = 0.05  # Change to 0.5 if you strictly need a 50% confidence level
+n = 272       # Replace 272 with your actual sample size if different
 
-mydata = mtcars %>%
-  select(mpg, cyl, disp, hp, wt)
+t_table = qt(alpha/2, df = n-2, lower.tail = FALSE)
+t_table
 
-# Check the data
-str(mydata)
+f=summary(l)$fstatistic
+f
 
-# Build model
-model = lm(mpg ~ cyl + disp + hp + wt, data = mydata)
-
-model
-
-corr_test=cor.test(mtcars$wt,mtcars$mpg,
-                   method="pearson")
-print(corr_test)
-
-ggplot(data=mtcars, aes(x=wt, y=mpg)) +
-  geom_point(aes(color=factor(cyl)), size=3) +
-  geom_smooth(method="lm", color="pink", se=FALSE) +
-  labs(title="car weight vs mpg", x="Weight", y="Miles per gallon", color="Cylinders") +
-  theme_minimal()
-
-mydata=diamonds
-plot(mydata$carat,mydata$price,ylab="price",xlab="carat",main="prics vs carat")
-
-fit=lm(mydata$price~mydata$carat)
-fit
-
-
-
-
+f_table=qf(0.95,df1=f[2],df=f[3])
+f_table 
