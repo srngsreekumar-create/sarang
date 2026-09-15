@@ -1,91 +1,12 @@
-#scatter plot
-plot(x=mtcar$wt,y=mtcars$mpg,
-     main="car weight vs fuel efficincy",
-     xlab="weight(1000 lbs",
-     ylab="miles per gallon(mpg0",
-     col="red,pch=19")
-
-#correlation test
-corr_test=cor.test(mtcars$wt,mtcars$mpg,
-                   method="pearson")
-print(corr_test)
-
-#residual analysis
-r_val=(corr_test$estimate,)
-r_val
-
-#regression coefficients
-cars
-s=cars$speed
-s_bar=mean(s)
-s_bar
-
-d=cars$dist
-d_bar=mean(d)
-d_bar
-
-r=cor(dist,speed)
-r
-
-x=sd(s)
-x
-
-y=sd(d)
-y
-
-b1=r*(y/x)
-b1
-
-b0=d_bar-b1*s_bar
-b0
-
-plot(cars$speed,cars$dist,
-     ylab="car stopping distnace",
-     xlab="speed",
-     main="car speed vs stopping distnace")
-
-SLR=lm(dist~speed)
-SLR
-
-#normality assumption of the error term
-residual=SLR$residuals
-residual
-
-#homoscedasticity assumption
-plot(SLR$residuals~speed)
-abline(0,0)
-
-# R^2 and goodness fit
-summary(SLR)
-
-#hypothesis test for the significance of slope
-anova(SLR)
-lin_Mod=lm(dist~speed,data=cars)
-lin_Mod
-
-new_speeds=data.frame(speed=c(13,20,25,10))
-new_speeds
-
-predict(lin_Mod,newdata = new_speeds)
-predict(lin_Mod,newdata = new_speeds,interval="prediction")
-mydata=cars
-library("ggplot2")
-p=ggplot(mydata,aes(speed,dist))+
-  geom_point()+
-  stat_smooth(method=lm)
-p
-p+geom_line(aes(y=lwr),col="red",linetype="dashed")+
-  geom_line(aes(y=upr),col="red",linetype="dashed")
+#mlr estimation
 
 mtcars
 names(mtcars)
-summary(mtcars)
 
-model=lm(mpg~cyl+disp+hp+drat+wt+qsec+vs+am+gear+carb,data=mtcars)
+model=lm(mpg~cyl+disp+hp+drat+wt+qsec+vs+am+gear+carb,data = mtcars)
 model
 
-teststat=coef(summary(model))[3,1]/
-  coef(summary(model))[3/2]
+teststat=coef(summary(model))[3,1]/coef(summary(model))[3,2]
 teststat
 
 2*pt(teststat,21,lower.tail=FALSE)
@@ -93,14 +14,75 @@ teststat
 plot(model$residuals~mtcars$disp)
 abline(0,0)
 
-model2=lm(mpg~qsec+wt+am,data = mtcars)
+model2=lm(mpg~qsec+wt+am,data=mtcars)
 summary(model2)
 
 new_values=data.frame(wt=2.92,qsec=20.1,am=1)
 new_values
 
-x=predict(model2,new_values,interval="prediction")
+pred_y = predict(model2,new_values,interval="prediction")
+pred_y
+
+x=predict(model2,new_values,interval="confidence")
 x
 
-y=predict(model2,new_values,interval="confidence")
-y
+---------------------------------
+
+cars
+
+lin_Mod=lm(dist~speed,data = cars) 
+lin_Mod
+
+new_speeds=data.frame(speed=c(13,20,25,10))
+new_speeds
+
+predict(lin_Mod,newdata=new_speeds)
+
+predict(lin_Mod,newdata=new_speeds,interval="confidence")
+
+predict(lin_Mod,newdata = new_speeds,interval="prediction")
+
+library("ggplot2")
+p=ggplot(cars,aes(speed,dist))+
+  geom_point()+
+  stat_smooth(method=lm)
+p
+
+p+geom_line(aes(y=LWR),color="red",linetype="dashed")+
+  geom_line(aes(y=UPR),color="red",linetype="dashed")
+
+-------------------------------------------
+
+library(UsingR)
+library(broom)
+library(ggplot2)
+data(diamond)
+mydata=diamond
+
+plot(mydata$carat,mydata$price,
+     xlab = "carat",ylab = "price",main = "price v/s carat")
+
+fit=lm(mydata$price~mydata$carat)
+fit
+
+summary(fit)
+abline(fit,color="red")
+
+model.diag.metrics=augmented(fit)
+head(model.diag.metrics)
+
+ggplot(model.diag.metrics,aes(mydata$carat,mydata$price))+
+  geom_point()+stat_smooth(method=lm,se=FALSE)+
+  geom_segment( xend=mydata$carat,yend=fitted ),color="red",size=0.5,)+
+  labs(x="carat",y="price",title = "observed v/s fitted values")
+
+plot(fit,1)
+plot(fit,2)
+plot(fit,3)
+plot(fit,4)
+plot(fit,5)
+
+-------------------------------------------------------------------
+
+
+
