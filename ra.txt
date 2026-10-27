@@ -1,41 +1,173 @@
-#validating and tesing slr
+plot(x=mtcars$wt,
+     y=mtcars$mpg,
+     main="weight v/s fuel eficciency",
+     xlab="weight",
+     ylab="fuel efficiency",
+     color="red",pch=19)
+
+corr_test=cor.test(mtcars$wt,mtcar$mpg,
+                   method="pearson")
+corr_test
+
+r = round(corr_test$estimate,4)
+r
+
+mydata = mtcars[c(1,3,4,5)]
+corr_2 = round(cor(mydata,method = "pearson"),4)
+corr_2
+
+library(corrplot)
+
+corrplot(corr_2,type="upper",
+         order = "hclust")
+-------------------------------------  
+cars
+
+speed = cars$speed
+dist = cars$dist
+
+avg_speed = mean(speed)
+avg_speed
+
+avg_dist = mean(dist)
+avg_dist
+
+stdd_speed = sd(speed)
+stdd_speed
+
+stdd_dist = sd(dist)
+stdd_dist
+
+r = cor(speed,dist)
+r
+
+b1 = r * (stdd_dist / stdd_speed)
+b1
+
+b0 = avg_dist - b1 * avg_speed
+b0
+
+SLR = lm(dist~speed)
+SLR
+
+residual = SLR$residuals
+residual
+
+plot(SLR$residual,speed)
+
+summary(SLR)
+
+anova(SLR)
+
+ft = qf(0.95, df1 = 1,df2 = 48)
+ft
+
+confint(SLR,level = 0.95)
+
+
+
+x = lm(dist~speed)
+x
+
+summary(x)
+abline(x,col="red")
+
+model.diag.metrics = augment(x)
+model.diag.metrics
+head(model.diag.metrics)
+
+plot(x,1)
+plot(x,2)
+plot(x,3)
+plot(x,4)
+plot(x,5)
+
 
 faithful
 
-scatter.smooth(x=faithful$eruptions,y=faithful$waiting,
+scatter.smooth(faithful$eruptions,faithful$waiting,
                main="waiting time v/s eruption duration",
-               xlab="eruption duration",ylab = "waiting time")
+               xlab="eruption",
+               ylab = "time")
+y = lm(waiting~eruptions,data = faithful)
+y
 
-cor(faithful$eruptions,faithful$waiting)
-
-l=lm(waiting~eruptions,data = faithful)
-l
-
-model_summary=summary(l)
+model_summary = summary(y)
 model_summary
 
-model_coeffs=model_summary$coefficients
-model_coeffs
+model_coeffs = model_summary$coefficients
+model_summary
 
-nrow(faithful)
+n = nrow(faithful)
+n
 
-beta.estimate=model_coeffs["eruptions","Estimate"]
-beta.estimate
+beta.est = model_coeffs["eruptions","Estimate"]
+beta.est
 
-std.error=model_coeffs["eruptions","Std. Error"]
+std.error = model_coeffs["eruptions","Std. Error"]
 std.error
 
-t_value=beta.estimate/std.error
-t_value
+t = beta.est / std.error
+t
 
-alpha = 0.05  # Change to 0.5 if you strictly need a 50% confidence level
-n = 272       # Replace 272 with your actual sample size if different
+ttable = qt(1 - (alpha / 2), df = n - 2)
+ttable
 
-t_table = qt(alpha/2, df = n-2, lower.tail = FALSE)
-t_table
+p = 2*pt(-abs(t),
+         df = nrow(faithful),ncol(faithful))
+p
 
-f=summary(l)$fstatistic
+f = summary(y$fstatistic)
 f
 
-f_table=qf(0.95,df1=f[2],df=f[3])
-f_table 
+# For a 95% confidence level (alpha = 0.05), df1 = 2, df2 = 270
+ftable = qf(0.95, df1 = 2, df2 = 270)
+ftable
+
+
+dim(cars)
+
+lin_mod = lm(dist~speed,data = cars)
+lin_mod
+
+new_speed = data.frame(speed=c(13,20,25,10))
+new_speed
+
+predict(lin_mod,newdata = new_speed)
+
+predict(lin_mod,newdata = new_speed,interval="confidence")
+
+predict(lin_mod,newdata = new_speed,interval="prediction")
+
+stackloss
+names(stackloss)
+
+y = lm(stack.loss~Air.Flow+Water.Temp+Acid.Conc.,
+       data = stackloss)
+y
+
+mtcars
+
+model = lm(mpg~disp+hp+drat+wt+qsec+vs+am+gear+carb,data=mtcars)
+model
+
+summary(model)
+
+teststat = coef(summary(model))[3,1]/
+  coef(summary(model))[3,2]
+teststat
+
+model2 = lm(mpg~qsec+wt+am,data = mtcars)
+model2
+
+summary(model2)
+
+newvalues = data.frame(wt=2.92,qsec=20.1,am=1)
+newvalues
+
+z = predict(model2,newvalues,interval = "predict")
+z
+
+a = predict(model2,newvalues,interval = "confidence")
+a
+
