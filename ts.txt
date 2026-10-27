@@ -1,0 +1,147 @@
+# PART B
+
+install.packages("forecast")
+install.packages("tseries")
+
+library(forecast)
+library(tseries)
+
+Seatbelts
+data("Seatbelts")
+sb = Seatbelts[, "DriversKilled"]
+
+
+print(sb)
+plot(sb, main = "Monthly Drivers Killed",
+     xlab = "Year", ylab = "Drivers Killed")
+
+#Divide into training and test data
+train = window(sb, end = c(1982, 12))
+train
+test = window(sb, start = c(1983, 1), end = c(1984, 12))
+test
+#number of observations
+length(train)
+length(test)
+
+# Display training and test data
+print(train)
+print(test)
+
+#stationarity using ADF test
+adf.test(train, k = 12)
+
+#fit different forecasting models
+model1 = naive(train, h = 24)
+model1
+
+model2 = snaive(train, h = 24)
+model2
+
+model3 = HoltWinters(train, seasonal = "multiplicative")
+model3
+forecast3 = forecast(model3, h = 24)
+forecast3
+
+model4 = ets(train)
+model4
+forecast4 = forecast(model4, h = 24)
+forecast4
+
+model5 = auto.arima(train, seasonal = TRUE)
+model5
+forecast5 = forecast(model5, h = 24)
+forecast5
+
+#display model summaries
+print(model1)
+print(model2)
+print(model3)
+print(model4)
+print(model5)
+
+
+summary(model5)
+
+
+actual = as.numeric(test)
+actual
+
+predictions = list(
+  Naive = as.numeric(model1$mean),
+  Seasonal_Naive = as.numeric(model2$mean),
+  Holt_Winters = as.numeric(forecast3$mean),
+  ETS = as.numeric(forecast4$mean),
+  ARIMA = as.numeric(forecast5$mean)
+)
+predictions
+
+forecast_table = data.frame(
+  Month = time(test),
+  Actual = actual,
+  Naive = predictions$Naive,
+  Seasonal_Naive = predictions$Seasonal_Naive,
+  Holt_Winters = predictions$Holt_Winters,
+  ETS = predictions$ETS,
+  ARIMA = predictions$ARIMA
+)
+
+forecast_table
+
+
+get_metrics = function(actual, predicted) {
+  error = actual - predicted
+  ME = mean(error)
+  RMSE = sqrt(mean(error^2))
+  MAE = mean(abs(error))
+  MAPE = mean(abs(error / actual)) * 100
+  
+  return(c(
+    ME = ME,
+    RMSE = RMSE,
+    MAE = MAE,
+    MAPE = MAPE
+  ))
+}
+get_metrics
+
+results = t(sapply(predictions, function(predicted) {
+  get_metrics(actual, predicted)
+}))
+
+results = data.frame(
+  Model = rownames(results),
+  results,
+  row.names = NULL
+)
+results
+
+
+plot(test, pch = 16,
+     main = "Actual vs Forecasted Drivers Killed",
+     xlab = "Year", ylab = "Drivers Killed")
+
+lines(ts(predictions$Naive, start = c(1983, 1),
+         frequency = 12), col = "pink", lty = 2)
+
+lines(ts(predictions$Seasonal_Naive, start = c(1983, 1),
+         frequency = 12), col = "darkblue", lty = 2)
+
+lines(ts(predictions$Holt_Winters, start = c(1983, 1),
+         frequency = 12), col = "darkgreen", lty = 2)
+
+lines(ts(predictions$ETS, start = c(1983, 1),
+         frequency = 12), col = "purple", lty = 2)
+
+lines(ts(predictions$ARIMA, start = c(1983, 1),
+         frequency = 12), col = "magenta", lty = 2)
+
+#ARIMA residuals
+checkresiduals(model5)
+
+best_model = results$Model[which.min(results$RMSE)]
+best_model
+
+# Display the error measures of the best model
+results[which.min(results$RMSE), ]
+results
