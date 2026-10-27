@@ -16,3 +16,44 @@ adf.test(diff(log(AirPassengers)))
 plot(diff(diff(log(AirPassengers))))
 adf.test(diff(diff(log(AirPassengers))))
 
+---------------------------------------------------------------------------------
+
+data(mtcars)
+
+model = lm(mpg ~ wt + hp + disp, data = mtcars)
+model
+
+summary(model)
+
+# Regression equation coefficients
+coef(model)
+
+summary(model)
+
+# Overall F-test
+summary(model)$fstatistic
+
+# Individual t-tests
+summary(model)$coefficients
+
+cor(mtcars[, c("wt", "hp", "disp")])
+
+cor_matrix <- cor(mtcars[, c("wt", "hp", "disp")])
+
+print(cor_matrix)
+
+install.packages("car")  # Run only once
+library(car)
+
+vif(model)
+
+v <- vif(model)
+
+
+if (any(v > 10)) {
+  print("Serious multicollinearity: VIF > 10")
+} else if (any(v > 5)) {
+  print("Warning: Multicollinearity present (VIF > 5)")
+} else {
+  print("No serious multicollinearity: All VIF values <= 5")
+}
